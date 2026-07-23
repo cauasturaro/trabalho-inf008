@@ -1,5 +1,7 @@
 package br.edu.ifba.inf008.plugins.ecommerce.domain;
 
+import br.edu.ifba.inf008.plugins.ecommerce.domain.payment.PaymentResult;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +23,7 @@ public class Order {
 
     private BigDecimal discountTotal = Money.ZERO;
     private BigDecimal shippingTotal = Money.ZERO;
+    private PaymentResult paymentResult;
 
     public Order(Customer customer) {
         this.customer = Objects.requireNonNull(customer, "customer");
@@ -96,5 +99,13 @@ public class Order {
 
     public void setShippingTotal(BigDecimal shippingTotal) {
         this.shippingTotal = Money.scale(shippingTotal);
+    }
+
+    public PaymentResult getPaymentResult() {
+        return paymentResult;
+    }
+
+    public void setPaymentResult(PaymentResult paymentResult) {
+        this.paymentResult = paymentResult;
     }
 }
