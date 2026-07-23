@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "db",
+			"path": "."
+		},
+		{
+			"name": "microkernel",
+			"path": "../microkernel"
+		},
+		{
+			"name": "trabalho-inf008",
+			"path": "../../../../../Documents/Code/IFBA/inf008/trabalho/trabalho-inf008"
+		}
+	],
+	"settings": {}
+}
