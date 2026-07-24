@@ -33,6 +33,17 @@ class CartServiceTest {
         public Optional<Product> findBySku(String sku) {
             return product.getSku().equals(sku) ? Optional.of(product) : Optional.empty();
         }
+
+        @Override
+        public boolean existsBySku(String sku) {
+            return product.getSku().equals(sku);
+        }
+
+        @Override
+        public Product insert(Product newProduct, int initialQuantity) {
+            newProduct.setId(2L);
+            return newProduct;
+        }
     }
 
     private final Product product =

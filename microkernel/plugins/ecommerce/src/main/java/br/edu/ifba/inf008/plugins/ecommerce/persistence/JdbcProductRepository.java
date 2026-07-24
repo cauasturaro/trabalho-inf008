@@ -61,6 +61,60 @@ public class JdbcProductRepository implements ProductRepository {
         }
     }
 
+    @Override
+    public boolean existsBySku(String sku) {
+        String sql = "SELECT 1 FROM products WHERE sku = ?";
+        try (Connection connection = Database.openConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, sku);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not check SKU " + sku + ".", e);
+        }
+    }
+
+    @Override
+    public Product insert(Product product, int initialQuantity) {
+        String productSql = "INSERT INTO products (sku, name, description, unit_price, active) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        String movementSql = "INSERT INTO stock_movements (product_id, movement_type, quantity, reason) "
+                + "VALUES (?, 'INBOUND', ?, 'Initial stock')";
+        try (Connection connection = Database.openConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = connection.prepareStatement(
+                        productSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                    statement.setString(1, product.getSku());
+                    statement.setString(2, product.getName());
+                    statement.setString(3, product.getDescription());
+                    statement.setBigDecimal(4, product.getUnitPrice());
+                    statement.setBoolean(5, product.isActive());
+                    statement.executeUpdate();
+                    try (ResultSet keys = statement.getGeneratedKeys()) {
+                        keys.next();
+                        product.setId(keys.getLong(1));
+                    }
+                }
+                if (initialQuantity > 0) {
+                    try (PreparedStatement statement = connection.prepareStatement(movementSql)) {
+                        statement.setLong(1, product.getId());
+                        statement.setInt(2, initialQuantity);
+                        statement.executeUpdate();
+                    }
+                }
+                connection.commit();
+                return product;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not save product " + product.getSku() + ".", e);
+        }
+    }
+
     private Product mapProduct(ResultSet resultSet) throws SQLException {
         return new Product(
                 resultSet.getLong("id"),

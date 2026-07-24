@@ -41,7 +41,7 @@ class JdbcRepositoriesTest {
     }
 
     @Test
-    void loadsSeedData() {
+    void loadsSeedData() throws Exception {
         List<Product> products = new JdbcProductRepository().findAllActive();
         List<Customer> customers = new JdbcCustomerRepository().findAll();
         List<ShippingMethod> methods = new JdbcShippingMethodRepository().findAll();
@@ -52,10 +52,12 @@ class JdbcRepositoriesTest {
         assertEquals(4, methods.size());
         // Seed has 4 discounts, one inactive.
         assertEquals(3, discounts.size());
-        // Laptop: 8 INBOUND - 1 OUTBOUND = 7 available.
+        // The available quantity must match an independent aggregation of
+        // stock_movements (the database may already contain orders placed
+        // through the application, so no fixed value is assumed).
         Product laptop = new JdbcProductRepository().findBySku("NB-IDEA-14").orElseThrow(
                 () -> new AssertionError("Seed product NB-IDEA-14 not found"));
-        assertEquals(7, laptop.getAvailableQuantity());
+        assertEquals(expectedAvailable(laptop.getId()), laptop.getAvailableQuantity());
     }
 
     @Test
@@ -86,6 +88,39 @@ class JdbcRepositoriesTest {
             cleanupOrder(saved.getId(), stockMovementWatermark);
         }
         assertTrue(databaseAvailable);
+    }
+
+    @Test
+    void insertsProductWithInitialStock() throws Exception {
+        JdbcProductRepository products = new JdbcProductRepository();
+        String sku = "TEST-SKU-" + System.currentTimeMillis();
+        Product product = new Product(null, sku, "Test Product", "Integration test product",
+                br.edu.ifba.inf008.plugins.ecommerce.domain.Money.of("10.00"), 0, true);
+
+        Product saved = products.insert(product, 4);
+        try {
+            assertNotNull(saved.getId());
+            assertTrue(products.existsBySku(sku));
+            assertEquals(4, products.findBySku(sku).get().getAvailableQuantity());
+        } finally {
+            try (Connection connection = Database.openConnection();
+                 Statement statement = connection.createStatement()) {
+                statement.executeUpdate(
+                        "DELETE FROM stock_movements WHERE product_id = " + saved.getId());
+                statement.executeUpdate("DELETE FROM products WHERE id = " + saved.getId());
+            }
+        }
+    }
+
+    private int expectedAvailable(long productId) throws Exception {
+        String sql = "SELECT COALESCE(SUM(CASE movement_type WHEN 'INBOUND' THEN quantity "
+                + "ELSE -quantity END), 0) FROM stock_movements WHERE product_id = " + productId;
+        try (Connection connection = Database.openConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            resultSet.next();
+            return resultSet.getInt(1);
+        }
     }
 
     private long maxId(String table) throws Exception {

@@ -17,4 +17,15 @@ public interface ProductRepository {
 
     /** A single active product by SKU, with its current available quantity. */
     Optional<Product> findBySku(String sku);
+
+    /** True when any product (active or not) already uses the given SKU. */
+    boolean existsBySku(String sku);
+
+    /**
+     * Persists a new product. When {@code initialQuantity > 0} an INBOUND
+     * stock movement ("Initial stock") is recorded in the same transaction.
+     *
+     * @return the same product with its generated id filled in
+     */
+    Product insert(Product product, int initialQuantity);
 }
