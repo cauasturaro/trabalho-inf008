@@ -24,6 +24,7 @@ public class Order {
     private BigDecimal discountTotal = Money.ZERO;
     private BigDecimal shippingTotal = Money.ZERO;
     private PaymentResult paymentResult;
+    private String paymentMethodCode;
 
     public Order(Customer customer) {
         this.customer = Objects.requireNonNull(customer, "customer");
@@ -107,5 +108,13 @@ public class Order {
 
     public void setPaymentResult(PaymentResult paymentResult) {
         this.paymentResult = paymentResult;
+    }
+
+    public String getPaymentMethodCode() {
+        return paymentMethodCode;
+    }
+
+    public void setPaymentMethodCode(String paymentMethodCode) {
+        this.paymentMethodCode = paymentMethodCode;
     }
 }

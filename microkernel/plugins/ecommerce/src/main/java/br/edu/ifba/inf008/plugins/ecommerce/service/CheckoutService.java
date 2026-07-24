@@ -54,6 +54,7 @@ public class CheckoutService {
         }
 
         order.setPaymentResult(result);
+        order.setPaymentMethodCode(payment.getMethodCode());
         order.setStatus(mapStatus(result));
         return order;
     }
