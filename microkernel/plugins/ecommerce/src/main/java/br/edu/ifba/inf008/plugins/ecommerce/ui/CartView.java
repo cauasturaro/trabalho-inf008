@@ -12,15 +12,17 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
@@ -39,13 +41,14 @@ public class CartView extends BorderPane {
     private final ComboBox<Product> productCombo = new ComboBox<>();
     private final Spinner<Integer> quantitySpinner = new Spinner<>(1, 999, 1);
     private final TableView<CartItem> table = new TableView<>();
-    private final Label subtotalLabel = new Label("Subtotal: -");
+    private final Label subtotalLabel = new Label("—");
 
     public CartView(ProductService productService, OrderService orderService, CartSession session) {
         this.productService = productService;
         this.orderService = orderService;
         this.session = session;
         buildLayout();
+        Theme.apply(this);
         session.addListener(this::refreshCartTable);
         refreshChoices();
     }
@@ -62,20 +65,30 @@ public class CartView extends BorderPane {
         productCombo.setPromptText("Select product");
         quantitySpinner.setPrefWidth(80);
 
-        Button addButton = new Button("Add to cart");
+        Button addButton = new Button("+ Add to cart");
+        addButton.getStyleClass().add("button-primary");
         addButton.setOnAction(event -> addSelectedProduct());
 
         Button removeButton = new Button("Remove selected");
+        removeButton.getStyleClass().add("button-danger");
         removeButton.setOnAction(event -> removeSelectedItem());
 
         Button reloadButton = new Button("Reload data");
         reloadButton.setOnAction(event -> refreshChoices());
 
+        Label title = new Label("Cart");
+        title.getStyleClass().add("title");
+        Label subtitle = new Label("Pick a customer and add products");
+        subtitle.getStyleClass().add("subtitle");
+        VBox heading = new VBox(2, title, subtitle);
+
         HBox customerRow = new HBox(8, new Label("Customer:"), customerCombo, reloadButton);
+        customerRow.setAlignment(Pos.CENTER_LEFT);
         HBox productRow = new HBox(8, new Label("Product:"), productCombo,
                 new Label("Quantity:"), quantitySpinner, addButton, removeButton);
-        VBox top = new VBox(8, customerRow, productRow);
-        top.setPadding(new Insets(10));
+        productRow.setAlignment(Pos.CENTER_LEFT);
+        VBox top = new VBox(12, heading, customerRow, productRow);
+        top.setPadding(new Insets(16));
 
         TableColumn<CartItem, String> productColumn = new TableColumn<>("Product");
         productColumn.setCellValueFactory(
@@ -97,11 +110,19 @@ public class CartView extends BorderPane {
         table.getColumns().add(lineTotalColumn);
         table.setPlaceholder(new Label("Cart is empty."));
 
-        subtotalLabel.setPadding(new Insets(10));
+        subtotalLabel.getStyleClass().add("total-value");
+        Label subtotalCaption = new Label("Cart subtotal");
+        subtotalCaption.getStyleClass().add("summary-name");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox bottom = new HBox(8, spacer, subtotalCaption, subtotalLabel);
+        bottom.setAlignment(Pos.CENTER_RIGHT);
+        bottom.setPadding(new Insets(12, 16, 16, 16));
 
+        BorderPane.setMargin(table, new Insets(0, 16, 0, 16));
         setTop(top);
         setCenter(table);
-        setBottom(subtotalLabel);
+        setBottom(bottom);
     }
 
     private void addSelectedProduct() {
@@ -147,14 +168,14 @@ public class CartView extends BorderPane {
         // Force cell re-rendering: merged lines keep the same CartItem instance,
         // so TableView would otherwise show the stale quantity and line total.
         table.refresh();
-        subtotalLabel.setText("Subtotal: " + Formats.currency(session.getCart().getSubtotal()));
+        subtotalLabel.setText(Formats.currency(session.getCart().getSubtotal()));
     }
 
     private void warn(String message) {
-        new Alert(Alert.AlertType.WARNING, message).showAndWait();
+        Dialogs.warn(message);
     }
 
     private void error(String message) {
-        new Alert(Alert.AlertType.ERROR, message).showAndWait();
+        Dialogs.error(message);
     }
 }

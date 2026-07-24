@@ -1,0 +1,278 @@
+/*
+ * E-commerce plugin theme.
+ * Single source of visual truth: views only attach style classes.
+ * Palette: indigo primary over a light slate background.
+ */
+
+.root {
+    -primary: #4f46e5;
+    -primary-hover: #4338ca;
+    -primary-soft: #eef2ff;
+    -surface: #ffffff;
+    -background: #f4f6fb;
+    -border: #e2e8f0;
+    -text: #0f172a;
+    -text-muted: #64748b;
+    -danger: #dc2626;
+    -success: #16a34a;
+
+    -fx-font-family: "Inter", "Segoe UI", "Ubuntu", "Cantarell", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -background;
+    -fx-text-fill: -text;
+}
+
+/* ---------- Core chrome (menu bar and tabs) ---------- */
+
+.menu-bar {
+    -fx-background-color: -surface;
+    -fx-border-color: transparent transparent -border transparent;
+}
+
+.menu-bar .label {
+    -fx-text-fill: -text;
+}
+
+.menu:hover, .menu:showing {
+    -fx-background-color: -primary-soft;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: -surface;
+}
+
+.tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 8 16 8 16;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: -primary-soft;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: -primary;
+}
+
+.tab-pane .tab:selected .focus-indicator {
+    -fx-border-color: transparent;
+}
+
+/* ---------- Typography ---------- */
+
+.title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+.section-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 12, 0, 0, 2);
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+    -fx-background-color: -surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+    -fx-text-fill: -text;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: derive(-surface, -3%);
+    -fx-border-color: #cbd5e1;
+}
+
+.button-primary {
+    -fx-background-color: -primary;
+    -fx-border-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button-primary:hover {
+    -fx-background-color: -primary-hover;
+    -fx-border-color: -primary-hover;
+}
+
+.button-danger {
+    -fx-text-fill: -danger;
+    -fx-border-color: #fecaca;
+}
+
+.button-danger:hover {
+    -fx-background-color: #fef2f2;
+    -fx-border-color: -danger;
+}
+
+/* ---------- Inputs ---------- */
+
+.text-field, .password-field, .combo-box, .spinner {
+    -fx-background-color: -surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+}
+
+.text-field, .password-field {
+    -fx-padding: 7 10 7 10;
+    -fx-prompt-text-fill: -text-muted;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .spinner:focused {
+    -fx-border-color: -primary;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: -text;
+    -fx-padding: 6 10 6 10;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -surface;
+    -fx-border-color: -border;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: -primary-soft;
+    -fx-text-fill: -primary;
+}
+
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-color: -surface;
+}
+
+/* ---------- Table ---------- */
+
+.table-view {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-padding: 2;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-padding: 4 8 4 8;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell {
+    -fx-background-color: -surface;
+    -fx-border-color: transparent;
+    -fx-cell-size: 36px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8fafc;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: -primary-soft;
+}
+
+.table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: -primary;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -text;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8 0 8;
+    -fx-border-color: transparent;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -text-muted;
+}
+
+/* ---------- Summary ---------- */
+
+.summary-name {
+    -fx-text-fill: -text-muted;
+}
+
+.summary-value {
+    -fx-text-fill: -text;
+    -fx-font-weight: bold;
+}
+
+.total-name {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.total-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary;
+}
+
+.status-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Scroll bars ---------- */
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 8;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #94a3b8;
+}

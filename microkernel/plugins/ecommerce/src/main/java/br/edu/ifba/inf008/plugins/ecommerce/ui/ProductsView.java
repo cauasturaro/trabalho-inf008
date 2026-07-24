@@ -10,7 +10,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -19,9 +18,13 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,11 +42,20 @@ public class ProductsView extends BorderPane {
     public ProductsView(ProductService productService) {
         this.productService = productService;
         buildLayout();
+        Theme.apply(this);
         refresh();
     }
 
     private void buildLayout() {
+        Label title = new Label("Products");
+        title.getStyleClass().add("title");
+        Label subtitle = new Label("Browse the catalog and register new products");
+        subtitle.getStyleClass().add("subtitle");
+        VBox heading = new VBox(2, title, subtitle);
+
         searchField.setPromptText("Search by SKU or name");
+        searchField.setPrefWidth(240);
+        searchField.setOnAction(event -> refresh());
         Button searchButton = new Button("Search");
         searchButton.setOnAction(event -> refresh());
         Button clearButton = new Button("Clear");
@@ -51,14 +63,18 @@ public class ProductsView extends BorderPane {
             searchField.clear();
             refresh();
         });
-        searchField.setOnAction(event -> refresh());
 
-        Button newProductButton = new Button("New product");
+        Button newProductButton = new Button("+ New product");
+        newProductButton.getStyleClass().add("button-primary");
         newProductButton.setOnAction(event -> openNewProductDialog());
 
-        HBox toolbar = new HBox(8, new Label("Products"), searchField, searchButton, clearButton,
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox toolbar = new HBox(8, heading, spacer, searchField, searchButton, clearButton,
                 newProductButton);
-        toolbar.setPadding(new Insets(10));
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        toolbar.setPadding(new Insets(16));
 
         TableColumn<Product, String> skuColumn = new TableColumn<>("SKU");
         skuColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getSku()));
@@ -93,6 +109,7 @@ public class ProductsView extends BorderPane {
      */
     private void openNewProductDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
+        Dialogs.applyTheme(dialog);
         dialog.setTitle("New product");
         dialog.setHeaderText("Register a new product");
 
@@ -130,10 +147,9 @@ public class ProductsView extends BorderPane {
                         quantitySpinner.getValue());
                 refresh();
             } catch (IllegalArgumentException e) {
-                new Alert(Alert.AlertType.WARNING, e.getMessage()).showAndWait();
+                Dialogs.warn(e.getMessage());
             } catch (PersistenceException e) {
-                new Alert(Alert.AlertType.ERROR,
-                        "Could not save the product. Is the database running?").showAndWait();
+                Dialogs.error("Could not save the product. Is the database running?");
             }
         });
     }
@@ -156,8 +172,7 @@ public class ProductsView extends BorderPane {
             List<Product> products = productService.searchProducts(searchField.getText());
             table.setItems(FXCollections.observableArrayList(products));
         } catch (PersistenceException e) {
-            new Alert(Alert.AlertType.ERROR,
-                    "Could not load products. Is the database running?").showAndWait();
+            Dialogs.error("Could not load products. Is the database running?");
         }
     }
 }
