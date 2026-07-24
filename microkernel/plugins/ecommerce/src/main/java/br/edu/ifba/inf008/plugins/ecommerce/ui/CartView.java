@@ -144,6 +144,9 @@ public class CartView extends BorderPane {
 
     private void refreshCartTable() {
         table.setItems(FXCollections.observableArrayList(session.getCart().getItems()));
+        // Force cell re-rendering: merged lines keep the same CartItem instance,
+        // so TableView would otherwise show the stale quantity and line total.
+        table.refresh();
         subtotalLabel.setText("Subtotal: " + Formats.currency(session.getCart().getSubtotal()));
     }
 
